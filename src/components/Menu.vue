@@ -37,6 +37,8 @@ export default {
         { name: "Customers", to: "/customers", icon: "bi bi-person-gear" },
         { name: "Products", to: "/products", icon: "bi bi-box" },
         { name: "Transactions", to: "/transactions", icon: "bi bi-cash-stack" },
+        { name: "Sales", to: "/sales", icon: "bi bi-cash-stack" },
+        { name: "Profit", to: "/profit", icon: "bi bi-cash-stack" },
       ],
     };
   },

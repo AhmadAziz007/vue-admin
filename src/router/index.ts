@@ -17,6 +17,8 @@ import Transactions from "@/pages/transactions/Transactions.vue";
 import Customers from "@/pages/customers/Customers.vue";
 import CustomersCreate from "@/pages/customers/CustomerCreate.vue";
 import CustomersEdit from "@/pages/customers/CustomerEdit.vue";
+import Sales from "@/pages/sales/Sales.vue";
+import Profits from "@/pages/profit/Profit.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {path: '/register', component: Register},
@@ -39,7 +41,9 @@ const routes: Array<RouteRecordRaw> = [
       {path: '/products', component: Products},
       {path: '/products/create', component:ProductCreate},
       {path: '/products/:id/edit', component:ProductEdit},
-      {path: '/transactions', component:Transactions}
+      {path: '/transactions', component:Transactions},
+      {path: '/sales', component:Sales},
+      {path: '/profit', component:Profits},
     ]
   }
 ]
