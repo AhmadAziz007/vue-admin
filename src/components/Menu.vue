@@ -34,7 +34,7 @@ export default {
         { name: "Dashboard", to: "/", icon: "bi bi-speedometer2" },
         { name: "Users", to: "/users", icon: "bi bi-people" },
         { name: "Roles", to: "/roles", icon: "bi bi-person-gear" },
-        { name: "Customers", to: "/customers", icon: "bi bi-person-gear" },
+        { name: "Customers", to: "/customers", icon: "bi bi-people" },
         { name: "Products", to: "/products", icon: "bi bi-box" },
         { name: "Transactions", to: "/transactions", icon: "bi bi-cash-stack" },
         { name: "Sales", to: "/sales", icon: "bi bi-cash-stack" },
@@ -46,6 +46,12 @@ export default {
 </script>
 
 <style scoped>
+.bi bi-people {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+}
+
 .nav-link:hover,
 .nav-link.active {
   background-color: #f8f9fa;

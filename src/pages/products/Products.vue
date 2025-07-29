@@ -1,7 +1,20 @@
 <template>
   <h1 class="h3 mb-3 fw-normal">Table Products</h1>
-  <div class="pt-3 pb-3 mb-3 border-bottom">
+  <div class="pt-3 pb-3 mb-3 border-bottom d-flex align-items-center justify-content-between">
+    <!-- Tombol Add di kanan -->
     <router-link to="/products/create" class="btn btn-sm btn-outline-secondary">Add</router-link>
+
+    <!-- Search input di kiri -->
+    <div class="d-inline-block">
+      <div class="input-group input-group-sm" style="max-width: 250px;">
+        <input
+            type="text"
+            class="form-control"
+            placeholder="Search by title..."
+            v-model="searchTitle"
+        >
+      </div>
+    </div>
   </div>
 
   <div class="table-responsive small">
@@ -35,23 +48,23 @@
       </tbody>
     </table>
 
-    <nav v-if="lastPage > 1">
+    <nav v-if="meta.last_page > 1">
       <ul class="pagination">
-        <li class="page-item" :class="{ disabled: currentPage === 1 }">
-          <button class="page-link" @click="changePage(currentPage - 1)">Previous</button>
+        <li class="page-item" :class="{ disabled: meta.page === 1 }">
+          <button class="page-link" @click="changePage(meta.page - 1)">Previous</button>
         </li>
 
         <li
             v-for="page in lastPage"
             :key="page"
             class="page-item"
-            :class="{ active: currentPage === page }"
+            :class="{ active: meta.page === page }"
         >
           <button class="page-link" @click="changePage(page)">{{ page }}</button>
         </li>
 
-        <li class="page-item" :class="{ disabled: currentPage === lastPage }">
-          <button class="page-link" @click="changePage(currentPage + 1)">Next</button>
+        <li class="page-item" :class="{ disabled: meta.page === meta.last_page }">
+          <button class="page-link" @click="changePage(meta.page + 1)">Next</button>
         </li>
       </ul>
     </nav>
@@ -59,27 +72,21 @@
 </template>
 
 <script lang="ts">
-import {ref, onMounted} from "vue";
+import {ref, onMounted, watch} from "vue";
 import axios from "axios";
 import {useRoute, useRouter} from "vue-router";
-
-interface Product {
-  id: number;
-  barcode: string;
-  title: string;
-  description: string;
-  img_url: string;
-  stock: number;
-  price: number;
-  sell_price: number;
-  created_at: string;
-  updated_at: string;
-}
+import {Product} from "@/models/product";
 
 interface Meta {
-  limit: number;
+  last_page: number;
   page: number;
   total: number;
+  limit: number;
+}
+
+interface ApiResponse {
+  data: Product[];
+  meta: Meta;
 }
 
 export default {
@@ -87,12 +94,16 @@ export default {
   setup() {
     const products = ref<Product[]>([]);
     const meta = ref<Meta>({
-      limit: 5,
+      last_page: 1,
       page: 1,
-      total: 0
+      total: 0,
+      limit: 5
     });
 
-    const currentPage = ref(1);
+    const searchTitle = ref("");
+    watch(searchTitle, (newTitle) => {
+      fetchProducts(1);
+    });
     const lastPage = ref(1);
 
     const route = useRoute();
@@ -100,25 +111,32 @@ export default {
 
     const fetchProducts = async (page = 1) => {
       try {
-        const {data} = await axios.get('products', {
-          params: {page}
-        });
+        const response = await axios.post(
+            'products/search',
+            {title: searchTitle.value},
+            {
+              params: {page}
+            }
+        );
 
+        const data: ApiResponse = response.data;
         products.value = data.data;
         meta.value = data.meta;
-        currentPage.value = data.meta.page;
-
-        // Hitung last_page dari total dan limit
-        lastPage.value = Math.ceil(data.meta.total / data.meta.limit);
+        lastPage.value = data.meta.last_page;
 
         router.replace({query: {page}});
       } catch (error) {
         console.error("Error fetching products:", error);
+        alert("Failed to fetch products. Please try again.");
       }
     };
 
+    const searchProducts = () => {
+      fetchProducts(1);
+    };
+
     const getRowNumber = (index: number) => {
-      return (currentPage.value - 1) * meta.value.limit + index + 1;
+      return (meta.value.page - 1) * meta.value.limit + index + 1;
     };
 
     const changePage = (page: number) => {
@@ -131,13 +149,20 @@ export default {
       img.src = 'https://via.placeholder.com/60x60?text=Image+Error';
     };
 
+    const formatCurrency = (value: number) => {
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+      }).format(value);
+    };
+
     const deleteProduct = async (id: number) => {
       if (!confirm('Are you sure you want to delete this product?')) return;
 
       try {
         await axios.delete(`products/${id}`);
-
-        fetchProducts(currentPage.value);
+        fetchProducts(meta.value.page);
         alert("Product deleted successfully");
       } catch (error) {
         console.error("Error deleting product:", error);
@@ -148,20 +173,24 @@ export default {
     onMounted(async () => {
       if (route.query.success) {
         alert(route.query.success);
-        router.replace({ query: {} });
+        router.replace({query: {}});
       }
+
       const page = parseInt(route.query.page as string) || 1;
-      fetchProducts(page);
+      await fetchProducts(page);
     });
 
     return {
       products,
-      currentPage,
+      meta,
       lastPage,
+      searchTitle,
       getRowNumber,
       changePage,
       handleImageError,
-      deleteProduct
+      deleteProduct,
+      searchProducts,
+      formatCurrency
     };
   }
 };
