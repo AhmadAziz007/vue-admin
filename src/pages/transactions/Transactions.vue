@@ -163,7 +163,7 @@
 </template>
 
 <script lang="ts">
-import {reactive, onMounted, defineComponent, ref, computed} from 'vue';
+import {reactive, onMounted, defineComponent, ref} from 'vue';
 import axios, {AxiosError} from 'axios';
 import {Product} from '@/models/product';
 import {Cart} from '@/models/cart';
