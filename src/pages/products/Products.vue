@@ -101,7 +101,7 @@ export default {
     });
 
     const searchTitle = ref("");
-    watch(searchTitle, (newTitle) => {
+    watch(searchTitle, () => {
       fetchProducts(1);
     });
     const lastPage = ref(1);

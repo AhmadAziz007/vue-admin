@@ -56,6 +56,7 @@
                       <th scope="col">Invoice</th>
                       <th scope="col">Cashier</th>
                       <th scope="col">Customer</th>
+                      <th scope="col">Discount</th>
                       <th scope="col">Total</th>
                     </tr>
                     </thead>
@@ -77,10 +78,13 @@
                               : 'Umum'
                         }}
                       </td>
+                      <td class="text-center">{{ sale.discount }}</td>
                       <td class="text-end">Rp. {{ formatPrice(sale.grand_total) }}</td>
                     </tr>
+                    <!-- Perbaikan di sini: -->
                     <tr>
                       <td colspan="4" class="text-end fw-bold" style="background-color: #e6e6e7;">TOTAL SALES</td>
+                      <td class="text-center fw-bold" style="background-color: #e6e6e7;"></td>
                       <td class="text-end fw-bold" style="background-color: #e6e6e7;">Rp. {{ formatPrice(total) }}</td>
                     </tr>
                     </tbody>
